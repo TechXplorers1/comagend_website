@@ -56,6 +56,20 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+/* -------------------- DONATIONS -------------------- */
+
+export const donations = pgTable("donations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  amount: integer("amount").notNull(),
+  donorName: text("donor_name"),
+  donorEmail: text("donor_email").notNull(),
+  // program here is stored as text, but we restrict allowed values in the Zod schema
+  program: text("program").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+/* -------------------- INSERT SCHEMAS -------------------- */
+
 export const insertProgramSchema = createInsertSchema(programs).omit({ id: true });
 export const insertStorySchema = createInsertSchema(stories).omit({ id: true });
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({ id: true, publishedAt: true });
@@ -74,6 +88,17 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages)
     message: z.string().min(10, "Message must be at least 10 characters"),
   });
 
+export const insertDonationSchema = createInsertSchema(donations)
+  .omit({ id: true, createdAt: true })
+  .extend({
+    amount: z.number().min(1, "Donation amount must be at least ₹1"),
+    donorEmail: z.string().email("Please enter a valid email address"),
+    donorName: z.string().optional(),
+    program: z.enum(["general", "education", "nutrition", "healthcare"]),
+  });
+
+/* -------------------- TYPES -------------------- */
+
 export type Program = typeof programs.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
 
@@ -91,3 +116,6 @@ export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscr
 
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+
+export type Donation = typeof donations.$inferSelect;
+export type InsertDonation = z.infer<typeof insertDonationSchema>;

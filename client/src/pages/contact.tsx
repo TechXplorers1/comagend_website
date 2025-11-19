@@ -1,25 +1,34 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Clock, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertContactMessageSchema, type InsertContactMessage } from "@shared/schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  insertContactMessageSchema,
+  type InsertContactMessage,
+} from "@shared/schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 
 export default function Contact() {
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
-  
+
   const form = useForm<InsertContactMessage>({
     resolver: zodResolver(insertContactMessageSchema),
     defaultValues: {
@@ -46,7 +55,8 @@ export default function Contact() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to send message. Please try again.",
+        description:
+          error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
     },
@@ -84,10 +94,10 @@ export default function Contact() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
-      
-      <main className="pt-20">
+
+      <main className="pt-24">
         <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary/10 to-primary/5">
           <div className="container mx-auto px-4">
             <motion.div
@@ -100,7 +110,8 @@ export default function Contact() {
                 Get in Touch
               </h1>
               <p className="font-sans text-lg md:text-xl text-muted-foreground">
-                Have questions or want to get involved? We'd love to hear from you.
+                Have questions or want to get involved? We'd love to hear from
+                you.
               </p>
             </motion.div>
           </div>
@@ -109,24 +120,33 @@ export default function Contact() {
         <section className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+              {/* Form */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h2 className="font-heading font-bold text-3xl mb-4">Send us a message</h2>
+                <h2 className="font-heading font-bold text-3xl mb-4">
+                  Send us a message
+                </h2>
                 <p className="font-sans text-muted-foreground mb-8">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  Fill out the form below and we'll get back to you within 24
+                  hours.
                 </p>
 
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                  >
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">Your Name</FormLabel>
+                          <FormLabel className="font-sans font-medium">
+                            Your Name
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="John Doe"
@@ -145,7 +165,9 @@ export default function Contact() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">Email Address</FormLabel>
+                          <FormLabel className="font-sans font-medium">
+                            Email Address
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
@@ -165,7 +187,9 @@ export default function Contact() {
                       name="subject"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">Subject</FormLabel>
+                          <FormLabel className="font-sans font-medium">
+                            Subject
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="How can we help?"
@@ -184,7 +208,9 @@ export default function Contact() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">Message</FormLabel>
+                          <FormLabel className="font-sans font-medium">
+                            Message
+                          </FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us more about your inquiry..."
@@ -224,6 +250,7 @@ export default function Contact() {
                 </Form>
               </motion.div>
 
+              {/* Contact Info */}
               <motion.div
                 className="space-y-6"
                 initial={{ opacity: 0, x: 30 }}
@@ -231,9 +258,12 @@ export default function Contact() {
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div>
-                  <h2 className="font-heading font-bold text-3xl mb-4">Contact Information</h2>
+                  <h2 className="font-heading font-bold text-3xl mb-4">
+                    Contact Information
+                  </h2>
                   <p className="font-sans text-muted-foreground mb-8">
-                    Reach out to us through any of these channels. We're here to help.
+                    Reach out to us through any of these channels. We're here to
+                    help.
                   </p>
                 </div>
 
@@ -257,9 +287,15 @@ export default function Contact() {
                               <Icon className="h-6 w-6 text-primary" />
                             </div>
                             <div>
-                              <h3 className="font-heading font-semibold text-lg mb-1">{info.title}</h3>
-                              <p className="font-sans font-medium text-foreground mb-1">{info.content}</p>
-                              <p className="font-sans text-sm text-muted-foreground">{info.description}</p>
+                              <h3 className="font-heading font-semibold text-lg mb-1">
+                                {info.title}
+                              </h3>
+                              <p className="font-sans font-medium text-foreground mb-1">
+                                {info.content}
+                              </p>
+                              <p className="font-sans text-sm text-muted-foreground">
+                                {info.description}
+                              </p>
                             </div>
                           </div>
                         </Card>
@@ -269,9 +305,12 @@ export default function Contact() {
                 </div>
 
                 <Card className="p-6 bg-primary/5 border-primary/20">
-                  <h3 className="font-heading font-semibold text-lg mb-3">Need Immediate Assistance?</h3>
+                  <h3 className="font-heading font-semibold text-lg mb-3">
+                    Need Immediate Assistance?
+                  </h3>
                   <p className="font-sans text-sm text-muted-foreground mb-4">
-                    For urgent matters, please call us directly during business hours. We'll do our best to assist you right away.
+                    For urgent matters, please call us directly during business
+                    hours. We'll do our best to assist you right away.
                   </p>
                   <Button
                     variant="outline"
@@ -287,6 +326,7 @@ export default function Contact() {
           </div>
         </section>
 
+        {/* Map / Location */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <motion.div

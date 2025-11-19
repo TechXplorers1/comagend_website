@@ -2,7 +2,15 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Target, Eye, Heart, Users, Linkedin, Twitter, Mail } from "lucide-react";
+import {
+  Target,
+  Eye,
+  Heart,
+  Users,
+  Linkedin,
+  Twitter,
+  Mail,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import teamImage1 from "@assets/generated_images/Female_team_leader_portrait_ed33c58a.png";
@@ -14,22 +22,26 @@ export default function About() {
     {
       icon: Target,
       title: "Empowerment",
-      description: "We believe in equipping communities with the tools and knowledge to drive their own development.",
+      description:
+        "We believe in equipping communities with the tools and knowledge to drive their own development.",
     },
     {
       icon: Eye,
       title: "Transparency",
-      description: "We maintain open communication and accountability in all our programs and partnerships.",
+      description:
+        "We maintain open communication and accountability in all our programs and partnerships.",
     },
     {
       icon: Heart,
       title: "Compassion",
-      description: "We approach our work with empathy, understanding the unique challenges each community faces.",
+      description:
+        "We approach our work with empathy, understanding the unique challenges each community faces.",
     },
     {
       icon: Users,
       title: "Collaboration",
-      description: "We partner with local communities, organizations, and stakeholders to maximize impact.",
+      description:
+        "We partner with local communities, organizations, and stakeholders to maximize impact.",
     },
   ];
 
@@ -64,10 +76,10 @@ export default function About() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
-      
-      <main className="pt-20">
+
+      <main className="pt-24">
         <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary/10 to-primary/5">
           <div className="container mx-auto px-4">
             <motion.div
@@ -95,9 +107,15 @@ export default function About() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">Our Mission</h2>
+                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">
+                  Our Mission
+                </h2>
                 <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-                  To empower African communities through sustainable development programs that promote gender equality, youth development, and economic empowerment. We work alongside local communities to create lasting change that transforms lives and builds resilient societies.
+                  To empower African communities through sustainable development
+                  programs that promote gender equality, youth development, and
+                  economic empowerment. We work alongside local communities to
+                  create lasting change that transforms lives and builds
+                  resilient societies.
                 </p>
               </motion.div>
 
@@ -107,9 +125,15 @@ export default function About() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">Our Vision</h2>
+                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">
+                  Our Vision
+                </h2>
                 <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-                  A future where every community in Africa has equal access to opportunities, resources, and the power to shape their own development. We envision thriving communities where gender equality is the norm, youth are empowered to lead, and sustainable development is a reality.
+                  A future where every community in Africa has equal access to
+                  opportunities, resources, and the power to shape their own
+                  development. We envision thriving communities where gender
+                  equality is the norm, youth are empowered to lead, and
+                  sustainable development is a reality.
                 </p>
               </motion.div>
 
@@ -119,9 +143,16 @@ export default function About() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">Our Approach</h2>
+                <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">
+                  Our Approach
+                </h2>
                 <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-                  We believe in community-led development. Our approach centers on listening to the voices of those we serve, partnering with local leaders, and implementing programs that address the root causes of inequality and poverty. Through capacity building, advocacy, and direct service delivery, we create sustainable impact that extends beyond our immediate interventions.
+                  We believe in community-led development. Our approach centers
+                  on listening to the voices of those we serve, partnering with
+                  local leaders, and implementing programs that address the root
+                  causes of inequality and poverty. Through capacity building,
+                  advocacy, and direct service delivery, we create sustainable
+                  impact that extends beyond our immediate interventions.
                 </p>
               </motion.div>
             </div>
@@ -137,9 +168,12 @@ export default function About() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">Our Values</h2>
+              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+                Our Values
+              </h2>
               <p className="font-sans text-lg text-muted-foreground max-w-2xl mx-auto">
-                The principles that guide our work and define who we are as an organization.
+                The principles that guide our work and define who we are as an
+                organization.
               </p>
             </motion.div>
 
@@ -162,8 +196,12 @@ export default function About() {
                       <div className="bg-primary/10 inline-flex p-3 rounded-lg mb-4">
                         <Icon className="h-6 w-6 text-primary" />
                       </div>
-                      <h3 className="font-heading font-semibold text-xl mb-3">{value.title}</h3>
-                      <p className="font-sans text-muted-foreground">{value.description}</p>
+                      <h3 className="font-heading font-semibold text-xl mb-3">
+                        {value.title}
+                      </h3>
+                      <p className="font-sans text-muted-foreground">
+                        {value.description}
+                      </p>
                     </Card>
                   </motion.div>
                 );
@@ -181,9 +219,12 @@ export default function About() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">Meet Our Team</h2>
+              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+                Meet Our Team
+              </h2>
               <p className="font-sans text-lg text-muted-foreground max-w-2xl mx-auto">
-                Dedicated professionals committed to creating sustainable change in communities across Africa.
+                Dedicated professionals committed to creating sustainable change
+                in communities across Africa.
               </p>
             </motion.div>
 
@@ -242,9 +283,15 @@ export default function About() {
                       </motion.div>
                     </div>
                     <div className="p-6">
-                      <h3 className="font-heading font-semibold text-xl mb-1">{member.name}</h3>
-                      <p className="text-primary font-sans font-medium mb-3">{member.role}</p>
-                      <p className="font-sans text-muted-foreground text-sm">{member.bio}</p>
+                      <h3 className="font-heading font-semibold text-xl mb-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-primary font-sans font-medium mb-3">
+                        {member.role}
+                      </p>
+                      <p className="font-sans text-muted-foreground text-sm">
+                        {member.bio}
+                      </p>
                     </div>
                   </Card>
                 </motion.div>
