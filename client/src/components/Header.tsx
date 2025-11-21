@@ -1,3 +1,4 @@
+// client/src/components/Header.tsx
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
@@ -27,10 +28,12 @@ export default function Header() {
 
   const handleGetInvolvedClick = () => {
     if (location === "/") {
+      // Already on home → smooth scroll
       document
         .getElementById("get-involved-section")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
+      // Go to home with hash; Home page will handle scrolling
       navigate("/#get-involved-section");
     }
   };
@@ -84,7 +87,9 @@ export default function Header() {
                   whileHover={{ scale: 1.08 }}
                   transition={{ type: "spring", stiffness: 200 }}
                   className={`relative font-sans font-medium text-lg ${
-                    location === link.href ? "text-primary" : "text-foreground/70"
+                    location === link.href
+                      ? "text-primary"
+                      : "text-foreground/70"
                   } hover:text-primary`}
                 >
                   {link.label}
@@ -148,7 +153,9 @@ export default function Header() {
                   <motion.a
                     whileHover={{ x: 5 }}
                     className={`block py-2 font-medium text-lg ${
-                      location === link.href ? "text-primary" : "text-foreground"
+                      location === link.href
+                        ? "text-primary"
+                        : "text-foreground"
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
