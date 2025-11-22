@@ -7,20 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 
-export default function AdminDashboard() {  // 👈 DEFAULT EXPORT
-  const { data: programs, isLoading: isProgramsLoading } = useQuery<Program[]>({
-    queryKey: ["/api/programs"],
-  });
+export default function AdminDashboard() {
+  const { data: programs, isLoading: isProgramsLoading, error: programsError } =
+    useQuery<Program[]>({
+      queryKey: ["/api/programs"],
+    });
 
-  const { data: blogPosts, isLoading: isBlogLoading } = useQuery<BlogPost[]>({
-    queryKey: ["/api/blog"],
-  });
+  const { data: blogPosts, isLoading: isBlogLoading, error: blogError } =
+    useQuery<BlogPost[]>({
+      queryKey: ["/api/blog"],
+    });
 
-  const { data: contactMessages, isLoading: isContactsLoading } = useQuery<
-    ContactMessage[]
-  >({
-    queryKey: ["/api/contact"],
+  // 👇 match admin-contacts.tsx: /api/contact-messages
+  const {
+    data: contactMessages,
+    isLoading: isContactsLoading,
+    error: contactsError,
+  } = useQuery<ContactMessage[]>({
+    queryKey: ["/api/contact-messages"],
   });
 
   const totalPrograms = programs?.length ?? 0;
@@ -48,25 +54,29 @@ export default function AdminDashboard() {  // 👈 DEFAULT EXPORT
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Programs */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base font-semibold">
               Recent Programs
             </CardTitle>
-            <Button variant="ghost" size="sm" className="text-xs">
-              View all
-              <ArrowRight className="h-3 w-3 ml-1" />
+            <Button variant="ghost" size="sm" className="text-xs" asChild>
+              <Link href="/admin/programs">
+                <span className="flex items-center">
+                  View all
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </span>
+              </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {isProgramsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
+              <SkeletonList />
+            ) : programsError ? (
+              <p className="text-sm text-destructive">
+                Failed to load programs.
+              </p>
             ) : programs && programs.length > 0 ? (
               <ul className="space-y-3">
                 {programs.slice(0, 5).map((program) => (
@@ -91,24 +101,69 @@ export default function AdminDashboard() {  // 👈 DEFAULT EXPORT
           </CardContent>
         </Card>
 
+        {/* Recent Blog Posts */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base font-semibold">
+              Recent Blog Posts
+            </CardTitle>
+            <Button variant="ghost" size="sm" className="text-xs" asChild>
+              <Link href="/admin/blog">
+                <span className="flex items-center">
+                  View all
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </span>
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isBlogLoading ? (
+              <SkeletonList />
+            ) : blogError ? (
+              <p className="text-sm text-destructive">Failed to load blog.</p>
+            ) : blogPosts && blogPosts.length > 0 ? (
+              <ul className="space-y-3">
+                {blogPosts.slice(0, 5).map((post) => (
+                  <li
+                    key={post.id}
+                    className="flex items-start justify-between gap-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium line-clamp-1">{post.title}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No blog posts yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Recent Contact Messages */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base font-semibold">
               Latest Contact Messages
             </CardTitle>
-            <Button variant="ghost" size="sm" className="text-xs">
-              View all
-              <ArrowRight className="h-3 w-3 ml-1" />
+            <Button variant="ghost" size="sm" className="text-xs" asChild>
+              <Link href="/admin/contacts">
+                <span className="flex items-center">
+                  View all
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </span>
+              </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {isContactsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-4 w-5/6" />
-              </div>
+              <SkeletonList />
+            ) : contactsError ? (
+              <p className="text-sm text-destructive">
+                Failed to load contact messages.
+              </p>
             ) : contactMessages && contactMessages.length > 0 ? (
               <ul className="space-y-3">
                 {contactMessages.slice(0, 5).map((msg) => (
@@ -160,5 +215,15 @@ function StatCard({
         <p className="text-xs text-muted-foreground mt-1">{description}</p>
       </CardContent>
     </Card>
+  );
+}
+
+function SkeletonList() {
+  return (
+    <div className="space-y-3">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-5/6" />
+    </div>
   );
 }

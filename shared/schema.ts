@@ -56,6 +56,47 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+/* -------------------- NEW DYNAMIC CONTENT -------------------- */
+
+export const heroSlides = pgTable("hero_slides", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  subtitle: text("subtitle").notNull(),
+  image: text("image").notNull(),
+  programPath: text("program_path").notNull(),
+  order: integer("order").notNull().default(0),
+});
+
+export const impactStats = pgTable("impact_stats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  label: text("label").notNull(),
+  value: integer("value").notNull(),
+  suffix: text("suffix").notNull(),
+  icon: text("icon").notNull(), // Lucide icon name
+  order: integer("order").notNull().default(0),
+});
+
+export const partners = pgTable("partners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  logo: text("logo").notNull(),
+  category: text("category").notNull(), // Funding, Implementation, Community
+  website: text("website"),
+});
+
+export const projects = pgTable("projects", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  image: text("image").notNull(),
+  // Stats fields
+  duration: text("duration").notNull(),
+  beneficiaries: text("beneficiaries").notNull(),
+  partners: text("partners").notNull(),
+  outcomes: text("outcomes").notNull(),
+});
+
 /* -------------------- DONATIONS -------------------- */
 
 export const donations = pgTable("donations", {
@@ -97,6 +138,11 @@ export const insertDonationSchema = createInsertSchema(donations)
     program: z.enum(["general", "education", "nutrition", "healthcare"]),
   });
 
+export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
+export const insertImpactStatSchema = createInsertSchema(impactStats).omit({ id: true });
+export const insertPartnerSchema = createInsertSchema(partners).omit({ id: true });
+export const insertProjectSchema = createInsertSchema(projects).omit({ id: true });
+
 /* -------------------- TYPES -------------------- */
 
 export type Program = typeof programs.$inferSelect;
@@ -119,3 +165,15 @@ export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 
 export type Donation = typeof donations.$inferSelect;
 export type InsertDonation = z.infer<typeof insertDonationSchema>;
+
+export type HeroSlide = typeof heroSlides.$inferSelect;
+export type InsertHeroSlide = z.infer<typeof insertHeroSlideSchema>;
+
+export type ImpactStat = typeof impactStats.$inferSelect;
+export type InsertImpactStat = z.infer<typeof insertImpactStatSchema>;
+
+export type Partner = typeof partners.$inferSelect;
+export type InsertPartner = z.infer<typeof insertPartnerSchema>;
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;

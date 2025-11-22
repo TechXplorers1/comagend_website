@@ -1,7 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertNewsletterSubscriptionSchema, insertContactMessageSchema } from "@shared/schema";
+import {
+  insertNewsletterSubscriptionSchema,
+  insertContactMessageSchema,
+  insertProgramSchema,
+  insertBlogPostSchema
+} from "@shared/schema";
 import { fromError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -66,6 +71,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stories);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to fetch stories" });
+    }
+  });
+
+  // Programs CRUD
+  app.post("/api/programs", async (req, res) => {
+    try {
+      const validatedData = insertProgramSchema.parse(req.body);
+      const program = await storage.createProgram(validatedData);
+      res.json(program);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to create program" });
+    }
+  });
+
+  app.patch("/api/programs/:id", async (req, res) => {
+    try {
+      const validatedData = insertProgramSchema.partial().parse(req.body);
+      const program = await storage.updateProgram(req.params.id, validatedData);
+      res.json(program);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to update program" });
+    }
+  });
+
+  app.delete("/api/programs/:id", async (req, res) => {
+    try {
+      await storage.deleteProgram(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete program" });
+    }
+  });
+
+  // Blog CRUD
+  app.post("/api/blog", async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(validatedData);
+      res.json(post);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to create blog post" });
+    }
+  });
+
+  app.patch("/api/blog/:id", async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.partial().parse(req.body);
+      const post = await storage.updateBlogPost(req.params.id, validatedData);
+      res.json(post);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to update blog post" });
+    }
+  });
+
+  app.delete("/api/blog/:id", async (req, res) => {
+    try {
+      await storage.deleteBlogPost(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete blog post" });
+    }
+  });
+
+  // Contact Delete
+  app.delete("/api/contact/:id", async (req, res) => {
+    try {
+      await storage.deleteContactMessage(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete message" });
     }
   });
 

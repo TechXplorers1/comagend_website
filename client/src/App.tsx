@@ -9,33 +9,33 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 
+// Public pages
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Projects from "@/pages/projects";
+import ProgramsPage from "@/pages/programs";
+import ProgramDetail from "@/pages/program-detail";
 import Blog from "@/pages/blog";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
-import ProgramsPage from "@/pages/programs";        // 👈 new programs list page
-import ProgramDetail from "@/pages/program-detail"; // 👈 single program detail
 
 // Admin pages
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminPrograms from "@/pages/admin-programs";
+import AdminBlog from "@/pages/admin-blog";
+import AdminContacts from "@/pages/admin-contacts";
 import AdminLogin from "@/pages/admin-login";
 
 // Auth
 import { AuthProvider } from "@/lib/auth";
 import { RequireAuth } from "@/components/RequireAuth";
 
-// 👇 Scroll to top on every route change
+// Scroll to top on route change
 function ScrollToTopOnRouteChange() {
   const [location] = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto", // change to "smooth" if you want animation
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [location]);
 
   return null;
@@ -44,29 +44,26 @@ function ScrollToTopOnRouteChange() {
 function Router() {
   return (
     <>
-      {/* Auto scroll to top whenever path changes */}
       <ScrollToTopOnRouteChange />
 
       <Switch>
-        {/* Public routes */}
+        {/* Public Routes */}
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/projects" component={Projects} />
         <Route path="/blog" component={Blog} />
         <Route path="/contact" component={Contact} />
 
-        {/* Programs list page */}
+        {/* Programs list & detail */}
         <Route path="/programs" component={ProgramsPage} />
-
-        {/* Single program detail page */}
         <Route path="/programs/:id">
           {(params) => <ProgramDetail id={params.id} />}
         </Route>
 
-        {/* Public admin login */}
+        {/* Admin Login (Public) */}
         <Route path="/admin/login" component={AdminLogin} />
 
-        {/* PROTECTED: /admin -> dashboard, only if logged in */}
+        {/* Protected Admin Routes */}
         <Route path="/admin">
           {() => (
             <RequireAuth>
@@ -75,7 +72,31 @@ function Router() {
           )}
         </Route>
 
-        {/* 404 */}
+        <Route path="/admin/programs">
+          {() => (
+            <RequireAuth>
+              <AdminPrograms />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/blog">
+          {() => (
+            <RequireAuth>
+              <AdminBlog />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/contacts">
+          {() => (
+            <RequireAuth>
+              <AdminContacts />
+            </RequireAuth>
+          )}
+        </Route>
+
+        {/* 404 Page */}
         <Route component={NotFound} />
       </Switch>
 
