@@ -10,73 +10,22 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
-
-// African cultural images
-const literacyImage =
-  "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg?auto=compress&cs=tinysrgb&w=800";
-
-const youthImage =
-  "https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=800";
-
-const healthImage =
-  "https://images.pexels.com/photos/6129201/pexels-photo-6129201.jpeg?auto=compress&cs=tinysrgb&w=800";
+import { useQuery } from "@tanstack/react-query";
+import type { Project } from "@shared/schema";
 
 export default function ProgramsSection() {
-  const projects = [
-    {
-      id: 1,
-      title: "Women's Literacy & Skills Development",
-      category: "Education",
-      description:
-        "A comprehensive program providing adult literacy classes and vocational skills training to women in rural communities, enabling economic independence and community leadership.",
-      image: literacyImage,
-      stats: {
-        duration: "2022 - Present",
-        beneficiaries: "5,000+ women",
-        partners: "Local Education Authority, Women's Cooperative",
-        outcomes:
-          "85% participants now literate, 60% started small businesses",
-      },
-    },
-    {
-      id: 2,
-      title: "Youth Leadership Academy",
-      category: "Youth Development",
-      description:
-        "An intensive leadership and entrepreneurship training program for young people aged 18-25, equipping them with skills to become change-makers in their communities.",
-      image: youthImage,
-      stats: {
-        duration: "2021 - Present",
-        beneficiaries: "2,500+ youth",
-        partners: "University Partnership, Business Incubators",
-        outcomes:
-          "200+ youth-led initiatives launched, 75% employment rate",
-      },
-    },
-    {
-      id: 3,
-      title: "Community Health Champions",
-      category: "Health",
-      description:
-        "Training community health volunteers to provide essential healthcare education and services in underserved areas, improving health outcomes and awareness.",
-      image: healthImage,
-      stats: {
-        duration: "2020 - Present",
-        beneficiaries: "25,000+ community members",
-        partners: "Ministry of Health, Local Clinics",
-        outcomes:
-          "40% reduction in preventable diseases, 150 trained health volunteers",
-      },
-    },
-  ];
+  const { data: projects, isLoading } = useQuery<Project[]>({
+    queryKey: ["/api/projects"],
+  });
 
   const galleryImages = [
-    literacyImage,
-    youthImage,
-    healthImage,
+    "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg?auto=compress&cs=tinysrgb&w=800", // literacyImage
+    "https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=800", // youthImage
+    "https://images.pexels.com/photos/6129201/pexels-photo-6129201.jpeg?auto=compress&cs=tinysrgb&w=800", // healthImage
     "https://images.pexels.com/photos/3810757/pexels-photo-3810757.jpeg?auto=compress&cs=tinysrgb&w=800",
-    literacyImage,
+    "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg?auto=compress&cs=tinysrgb&w=800", // literacyImage
     "https://images.pexels.com/photos/3810757/pexels-photo-3810757.jpeg?auto=compress&cs=tinysrgb&w=800",
   ];
 
@@ -122,6 +71,14 @@ export default function ProgramsSection() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedImageIndex]);
 
+  if (isLoading) {
+    return (
+      <section className="py-24 flex justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </section>
+    );
+  }
+
   return (
     <section
       id="programs"
@@ -152,105 +109,108 @@ export default function ProgramsSection() {
       <section className="py-10 md:py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="space-y-16">
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{
-                  duration: 0.45,
-                  delay: index * 0.1,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                <Card className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                  {/* flex so image and content share the same card height */}
-                  <div
-                    className={`flex flex-col lg:flex-row ${
-                      index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                    }`}
-                  >
-                    {/* Image section */}
-                    <div className="relative w-full lg:w-1/2">
-                      {/* fixed aspect ratio on mobile, full height on desktop */}
-                      <div className="relative w-full h-56 md:h-64 lg:h-full">
-                        <img
-                          src={project.image}
-                          alt={project.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-primary/95 text-primary-foreground px-3 py-1 rounded-full text-xs md:text-sm font-sans font-semibold shadow-md">
-                          {project.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Content section */}
-                    <div className="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center space-y-4">
-                      <h3 className="font-heading font-bold text-2xl md:text-3xl">
-                        {project.title}
-                      </h3>
-                      <p className="font-sans text-muted-foreground leading-relaxed">
-                        {project.description}
-                      </p>
-
-                      <Card className="bg-muted/60 p-6 border-0 rounded-2xl shadow-inner">
-                        <h4 className="font-heading font-semibold text-lg mb-4">
-                          Program Overview
-                        </h4>
-                        <div className="space-y-3">
-                          <div className="flex items-start space-x-3">
-                            <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                            <div>
-                              <p className="font-sans font-medium text-sm">
-                                Duration
-                              </p>
-                              <p className="font-sans text-sm text-muted-foreground">
-                                {project.stats.duration}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start space-x-3">
-                            <Users className="h-5 w-5 text-primary mt-0.5" />
-                            <div>
-                              <p className="font-sans font-medium text-sm">
-                                Beneficiaries
-                              </p>
-                              <p className="font-sans text-sm text-muted-foreground">
-                                {project.stats.beneficiaries}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start space-x-3">
-                            <Award className="h-5 w-5 text-primary mt-0.5" />
-                            <div>
-                              <p className="font-sans font-medium text-sm">
-                                Partners
-                              </p>
-                              <p className="font-sans text-sm text-muted-foreground">
-                                {project.stats.partners}
-                              </p>
-                            </div>
-                          </div>
+            {projects?.length === 0 ? (
+              <div className="text-center text-muted-foreground">No programs found.</div>
+            ) : (
+              projects?.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: index * 0.1,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Card className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                    {/* flex so image and content share the same card height */}
+                    <div
+                      className={`flex flex-col lg:flex-row ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                        }`}
+                    >
+                      {/* Image section */}
+                      <div className="relative w-full lg:w-1/2">
+                        {/* fixed aspect ratio on mobile, full height on desktop */}
+                        <div className="relative w-full h-56 md:h-64 lg:h-full">
+                          <img
+                            src={project.image || "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg"}
+                            alt={project.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
                         </div>
-                      </Card>
+                        <div className="absolute top-4 left-4">
+                          <span className="bg-primary/95 text-primary-foreground px-3 py-1 rounded-full text-xs md:text-sm font-sans font-semibold shadow-md">
+                            {project.category}
+                          </span>
+                        </div>
+                      </div>
 
-                      <div className="pt-2">
-                        <h5 className="font-heading font-semibold text-base mb-1">
-                          Key Outcomes
-                        </h5>
-                        <p className="font-sans text-sm text-muted-foreground">
-                          {project.stats.outcomes}
+                      {/* Content section */}
+                      <div className="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center space-y-4">
+                        <h3 className="font-heading font-bold text-2xl md:text-3xl">
+                          {project.title}
+                        </h3>
+                        <p className="font-sans text-muted-foreground leading-relaxed">
+                          {project.description}
                         </p>
+
+                        <Card className="bg-muted/60 p-6 border-0 rounded-2xl shadow-inner">
+                          <h4 className="font-heading font-semibold text-lg mb-4">
+                            Program Overview
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-start space-x-3">
+                              <Calendar className="h-5 w-5 text-primary mt-0.5" />
+                              <div>
+                                <p className="font-sans font-medium text-sm">
+                                  Duration
+                                </p>
+                                <p className="font-sans text-sm text-muted-foreground">
+                                  {project.duration}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                              <Users className="h-5 w-5 text-primary mt-0.5" />
+                              <div>
+                                <p className="font-sans font-medium text-sm">
+                                  Beneficiaries
+                                </p>
+                                <p className="font-sans text-sm text-muted-foreground">
+                                  {project.beneficiaries}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                              <Award className="h-5 w-5 text-primary mt-0.5" />
+                              <div>
+                                <p className="font-sans font-medium text-sm">
+                                  Partners
+                                </p>
+                                <p className="font-sans text-sm text-muted-foreground">
+                                  {project.partners}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+
+                        <div className="pt-2">
+                          <h5 className="font-heading font-semibold text-base mb-1">
+                            Key Outcomes
+                          </h5>
+                          <p className="font-sans text-sm text-muted-foreground">
+                            {project.outcomes}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+                  </Card>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </section>

@@ -76,10 +76,11 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
           ? data.amount
           : selectedAmount || parseInt(customAmount) || 0;
 
-      return await apiRequest("POST", "/api/donation", {
+      const res = await apiRequest("POST", "/api/donations", {
         ...data,
         amount: finalAmount,
       });
+      return await res.json();
     },
   });
 
@@ -177,7 +178,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
 
     mutation.mutate(data, {
       onSuccess: async (response: any) => {
-        const donationId = response?.data?.donationId || "";
+        const donationId = response?.id || "";
 
         toast({
           title: "Donation initiated!",

@@ -29,6 +29,9 @@ import AdminBlog from "@/pages/admin-blog";
 import AdminLogin from "@/pages/admin-login";
 import AdminStaff from "@/pages/admin-staff";
 import AdminProjects from "@/pages/admin-projects";
+import AdminContacts from "@/pages/admin-contacts";
+import AdminPayments from "@/pages/admin-payments";
+import AdminSettings from "@/pages/admin-settings";
 
 // Auth
 import { AuthProvider } from "@/lib/auth";
@@ -107,6 +110,30 @@ function Router() {
           {() => (
             <RequireAuth>
               <AdminProjects />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/contacts">
+          {() => (
+            <RequireAuth>
+              <AdminContacts />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/payments">
+          {() => (
+            <RequireAuth>
+              <AdminPayments />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/settings">
+          {() => (
+            <RequireAuth>
+              <AdminSettings />
             </RequireAuth>
           )}
         </Route>

@@ -11,88 +11,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Clock, Calendar, ArrowRight } from "lucide-react";
+import { Clock, Calendar, ArrowRight, Loader2 } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 
 import blogImage from "@assets/generated_images/Adult_literacy_project_showcase_171ac1d0.png";
 
 export default function Blog() {
-  // --- SAMPLE DATA (type-safe with BlogPost) ---
-  const blogPosts: BlogPost[] = [
-    {
-      id: "1",
-      title: "Empowering Women through Rural Education Programs",
-      category: "Education",
-      excerpt:
-        "Our rural education initiative is unlocking opportunities for young women by providing access to quality learning...",
-      content: `Access to education transforms lives, especially for women in rural areas.
-      
-Our program focuses on:
-• Adult literacy classes  
-• Digital skill training  
-• Scholarships for girls  
+  const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog"],
+  });
 
-These women are now running small businesses, joining local councils, and inspiring others to dream bigger.
-
-One participant, Amina, says:  
-“Education gave me the power to stand up for my rights and help other women.”
-
-This initiative will be extended to 3 more villages in the coming months.`,
-      readTime: 5,
-      image: blogImage,
-      publishedAt: new Date("2025-02-10T10:00:00Z"),
-    },
-    {
-      id: "2",
-      title: "Health Camps Reached 4,200 Families Last Month",
-      category: "Health",
-      excerpt:
-        "Mobile health camps are bringing critical medical services to remote communities...",
-      content: `In remote regions where hospitals are far away, our mobile health camps are a lifesaver.
-
-Last month alone:
-• 4,200 families served  
-• 800 children vaccinated  
-• 350 prenatal checkups  
-
-Volunteer doctors, nurses, and local health workers are making a tremendous difference.
-
-Our next goal: Provide basic medical insurance to 1,000 families.`,
-      readTime: 4,
-      image: blogImage,
-      publishedAt: new Date("2025-02-05T08:00:00Z"),
-    },
-    {
-      id: "3",
-      title: "Youth Leadership Program Expands Nationwide",
-      category: "Youth",
-      excerpt:
-        "The youth leadership initiative is now active in 12 districts with over 600 participants...",
-      content: `Tomorrow's leaders are being shaped today.
-
-The Youth Leadership Program trains students in:
-• Public speaking  
-• Community organizing  
-• Problem-solving  
-• Entrepreneurship  
-
-65% of participants have already launched local initiatives like clean water projects, tutoring centers, and youth clubs.`,
-      readTime: 3,
-      image: blogImage,
-      publishedAt: new Date("2025-02-01T07:30:00Z"),
-    },
-  ];
-
-  const categories = [
-    "All",
-    "Education",
-    "Youth",
-    "Health",
-    "Empowerment",
-    "Gender",
-    "Development",
-  ];
+  const categories = ["All", ...Array.from(new Set(blogPosts?.map((p) => p.category) || []))];
 
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [scrollPositionBeforeOpen, setScrollPositionBeforeOpen] = useState(0);
@@ -102,7 +33,7 @@ The Youth Leadership Program trains students in:
   const filteredPosts =
     activeCategory === "All"
       ? blogPosts
-      : blogPosts.filter((post) => post.category === activeCategory);
+      : blogPosts?.filter((post) => post.category === activeCategory);
 
   const handleOpenPost = (post: BlogPost) => {
     if (typeof window !== "undefined") {
@@ -118,6 +49,18 @@ The Youth Leadership Program trains students in:
       window.scrollTo({ top: scrollPositionBeforeOpen, behavior: "smooth" });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 pt-24 flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -154,11 +97,10 @@ The Youth Leadership Program trains students in:
                   <Badge
                     key={category}
                     variant={isActive ? "default" : "outline"}
-                    className={`px-4 py-2 cursor-pointer font-sans transition-all ${
-                      isActive
+                    className={`px-4 py-2 cursor-pointer font-sans transition-all ${isActive
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-primary/10"
-                    }`}
+                      }`}
                     onClick={() => setActiveCategory(category)}
                   >
                     {category}
@@ -168,7 +110,7 @@ The Youth Leadership Program trains students in:
             </div>
 
             {/* Blog Cards Grid */}
-            {filteredPosts.length === 0 ? (
+            {!filteredPosts || filteredPosts.length === 0 ? (
               <p className="text-center text-muted-foreground">
                 No articles found for this category yet.
               </p>
@@ -181,11 +123,11 @@ The Youth Leadership Program trains students in:
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, delay: index * 0.05 }}
                   >
-                    <Card className="hover-elevate active-elevate-2 overflow-hidden flex flex-col">
+                    <Card className="hover-elevate active-elevate-2 overflow-hidden flex flex-col h-full">
                       {/* Image */}
                       <div className="relative h-40 md:h-48 overflow-hidden">
                         <motion.img
-                          src={post.image}
+                          src={post.image || blogImage}
                           alt={post.title}
                           className="w-full h-full object-cover object-center"
                           whileHover={{ scale: 1.05 }}
@@ -201,7 +143,7 @@ The Youth Leadership Program trains students in:
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             <span>
-                              {format(post.publishedAt, "MMMM dd, yyyy")}
+                              {format(new Date(post.publishedAt), "MMMM dd, yyyy")}
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
@@ -212,10 +154,10 @@ The Youth Leadership Program trains students in:
                         <h3 className="font-heading text-xl font-semibold mb-2">
                           {post.title}
                         </h3>
-                        <p className="text-muted-foreground">{post.excerpt}</p>
+                        <p className="text-muted-foreground line-clamp-3">{post.excerpt}</p>
                       </CardContent>
 
-                      <CardFooter className="p-6 pt-0">
+                      <CardFooter className="p-6 pt-0 mt-auto">
                         <Button
                           variant="ghost"
                           className="group font-sans font-medium p-0 h-auto hover:bg-transparent"
@@ -241,13 +183,13 @@ The Youth Leadership Program trains students in:
           if (!open) handleClosePost();
         }}
       >
-        <DialogContent className="max-w-3xl w-full p-0 overflow-hidden">
+        <DialogContent className="max-w-3xl w-full p-0 overflow-hidden max-h-[90vh]">
           {selectedPost && (
-            <div className="flex flex-col max-h-[90vh]">
+            <div className="flex flex-col h-full">
               {/* Image */}
               <div className="relative h-48 md:h-56 w-full overflow-hidden flex-shrink-0">
                 <img
-                  src={selectedPost.image}
+                  src={selectedPost.image || blogImage}
                   alt={selectedPost.title}
                   className="w-full h-full object-cover object-center"
                 />
@@ -268,7 +210,7 @@ The Youth Leadership Program trains students in:
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {format(selectedPost.publishedAt, "MMMM dd, yyyy")}
+                      {format(new Date(selectedPost.publishedAt), "MMMM dd, yyyy")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -299,6 +241,7 @@ The Youth Leadership Program trains students in:
           )}
         </DialogContent>
       </Dialog>
+
 
       <Footer />
     </div>

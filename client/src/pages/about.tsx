@@ -10,14 +10,23 @@ import {
   Linkedin,
   Twitter,
   Mail,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-import teamImage1 from "@assets/generated_images/Female_team_leader_portrait_ed33c58a.png";
-import teamImage2 from "@assets/generated_images/Male_team_member_portrait_e1b695c3.png";
-import teamImage3 from "@assets/generated_images/Young_female_educator_portrait_b9ab4a70.png";
+import { useQuery } from "@tanstack/react-query";
+import type { SiteConfig, Staff } from "@shared/schema";
 
 export default function About() {
+  const { data: config, isLoading: isConfigLoading } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config"],
+  });
+
+  const { data: staff, isLoading: isStaffLoading } = useQuery<Staff[]>({
+    queryKey: ["/api/staff"],
+  });
+
+  const isLoading = isConfigLoading || isStaffLoading;
+
   const values = [
     {
       icon: Target,
@@ -45,35 +54,17 @@ export default function About() {
     },
   ];
 
-  const team = [
-    {
-      name: "Dr. Amina Kabila",
-      role: "Executive Director",
-      bio: "Leading COMAGEND with 15+ years of experience in community development and gender advocacy.",
-      image: teamImage1,
-      email: "amina@comagend.org",
-      linkedin: "#",
-      twitter: "#",
-    },
-    {
-      name: "Robert Mensah",
-      role: "Program Coordinator",
-      bio: "Coordinating our youth development initiatives across multiple regions with proven impact.",
-      image: teamImage2,
-      email: "robert@comagend.org",
-      linkedin: "#",
-      twitter: "#",
-    },
-    {
-      name: "Grace Omondi",
-      role: "Community Outreach Lead",
-      bio: "Bridging the gap between our programs and the communities we serve with passion and dedication.",
-      image: teamImage3,
-      email: "grace@comagend.org",
-      linkedin: "#",
-      twitter: "#",
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 pt-24 flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -91,8 +82,8 @@ export default function About() {
               <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6">
                 About COMAGEND
               </h1>
-              <p className="font-sans text-lg md:text-xl text-muted-foreground">
-                Community Advocacy for Gender and Development
+              <p className="font-sans text-lg md:text-xl text-muted-foreground whitespace-pre-line">
+                {config?.aboutText || "Community Advocacy for Gender and Development"}
               </p>
             </motion.div>
           </div>
@@ -110,12 +101,8 @@ export default function About() {
                 <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">
                   Our Mission
                 </h2>
-                <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-                  To empower African communities through sustainable development
-                  programs that promote gender equality, youth development, and
-                  economic empowerment. We work alongside local communities to
-                  create lasting change that transforms lives and builds
-                  resilient societies.
+                <p className="font-sans text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {config?.missionText || "To empower African communities through sustainable development."}
                 </p>
               </motion.div>
 
@@ -128,12 +115,8 @@ export default function About() {
                 <h2 className="font-heading font-bold text-3xl md:text-4xl mb-6">
                   Our Vision
                 </h2>
-                <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-                  A future where every community in Africa has equal access to
-                  opportunities, resources, and the power to shape their own
-                  development. We envision thriving communities where gender
-                  equality is the norm, youth are empowered to lead, and
-                  sustainable development is a reality.
+                <p className="font-sans text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {config?.visionText || "A future where every community has equal access to opportunities."}
                 </p>
               </motion.div>
 
@@ -229,9 +212,9 @@ export default function About() {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {team.map((member, index) => (
+              {staff?.filter(m => m.isActive !== false).map((member, index) => (
                 <motion.div
-                  key={index}
+                  key={member.id}
                   className="group"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -245,7 +228,7 @@ export default function About() {
                   <Card className="overflow-hidden h-full hover-elevate active-elevate-2 transition-all">
                     <div className="relative overflow-hidden">
                       <img
-                        src={member.image}
+                        src={member.image || "https://via.placeholder.com/400x400?text=Team+Member"}
                         alt={member.name}
                         className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
                       />
@@ -253,33 +236,39 @@ export default function About() {
                         className="absolute inset-0 bg-primary/90 flex items-center justify-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         initial={false}
                       >
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          className="h-10 w-10"
-                          data-testid={`button-team-email-${index}`}
-                          aria-label="Email"
-                        >
-                          <Mail className="h-5 w-5" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          className="h-10 w-10"
-                          data-testid={`button-team-linkedin-${index}`}
-                          aria-label="LinkedIn"
-                        >
-                          <Linkedin className="h-5 w-5" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          className="h-10 w-10"
-                          data-testid={`button-team-twitter-${index}`}
-                          aria-label="Twitter"
-                        >
-                          <Twitter className="h-5 w-5" />
-                        </Button>
+                        {member.email && (
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-10 w-10"
+                            onClick={() => window.open(`mailto:${member.email}`)}
+                            aria-label="Email"
+                          >
+                            <Mail className="h-5 w-5" />
+                          </Button>
+                        )}
+                        {member.linkedin && (
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-10 w-10"
+                            onClick={() => window.open(member.linkedin!, "_blank")}
+                            aria-label="LinkedIn"
+                          >
+                            <Linkedin className="h-5 w-5" />
+                          </Button>
+                        )}
+                        {member.twitter && (
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-10 w-10"
+                            onClick={() => window.open(member.twitter!, "_blank")}
+                            aria-label="Twitter"
+                          >
+                            <Twitter className="h-5 w-5" />
+                          </Button>
+                        )}
                       </motion.div>
                     </div>
                     <div className="p-6">

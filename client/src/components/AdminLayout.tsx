@@ -10,6 +10,9 @@ import {
   Users,
   Layers,
   LogOut,
+  Settings,
+  Mail,
+  IndianRupee,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -21,9 +24,11 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/programs", label: "Programs", icon: BookOpen },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
-  { href: "/admin/staff", label: "Staff", icon: Users },       // 👈 Added
-  { href: "/admin/projects", label: "Projects", icon: Layers }, // 👈 Added
-  { href: "/", label: "Back to Site", icon: Home },
+  { href: "/admin/staff", label: "Staff", icon: Users },
+  { href: "/admin/projects", label: "Projects", icon: Layers },
+  { href: "/admin/contacts", label: "Messages", icon: Mail },
+  { href: "/admin/payments", label: "Payments", icon: IndianRupee },
+  { href: "/admin/settings", label: "Site Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -55,10 +60,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link key={item.href} href={item.href}>
                 <button
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-sans text-left transition 
-                    ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-foreground/80 hover:bg-muted"
+                    ${isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground/80 hover:bg-muted"
                     }`}
                 >
                   <Icon className="h-4 w-4" />

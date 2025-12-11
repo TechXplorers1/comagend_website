@@ -1,5 +1,3 @@
-// client/src/pages/admin-staff.tsx
-
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -25,36 +23,33 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
-
-type Staff = {
-  id: string;
-  name: string;
-  role: string;
-  photoUrl?: string | null;
-  bio?: string | null;
-  isActive: boolean;
-};
-
-type StaffInput = Omit<Staff, "id">;
+import ImageUpload from "@/components/ImageUpload";
+import type { Staff, InsertStaff } from "@shared/schema";
 
 export default function AdminStaff() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
-  const [form, setForm] = useState<StaffInput>({
+
+  const initialForm: InsertStaff = {
     name: "",
     role: "",
-    photoUrl: "",
+    image: "",
     bio: "",
+    email: "",
+    linkedin: "",
+    twitter: "",
     isActive: true,
-  });
+  };
+
+  const [form, setForm] = useState<InsertStaff>(initialForm);
 
   const { data: staff, isLoading } = useQuery<Staff[]>({
     queryKey: ["/api/staff"],
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: StaffInput) => {
+    mutationFn: async (data: InsertStaff) => {
       await apiRequest("POST", "/api/staff", data);
     },
     onSuccess: () => {
@@ -72,7 +67,7 @@ export default function AdminStaff() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<StaffInput> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertStaff> }) => {
       await apiRequest("PATCH", `/api/staff/${id}`, data);
     },
     onSuccess: () => {
@@ -109,13 +104,7 @@ export default function AdminStaff() {
 
   const openCreate = () => {
     setEditingStaff(null);
-    setForm({
-      name: "",
-      role: "",
-      photoUrl: "",
-      bio: "",
-      isActive: true,
-    });
+    setForm(initialForm);
     setIsDialogOpen(true);
   };
 
@@ -124,9 +113,12 @@ export default function AdminStaff() {
     setForm({
       name: staffMember.name,
       role: staffMember.role,
-      photoUrl: staffMember.photoUrl ?? "",
-      bio: staffMember.bio ?? "",
-      isActive: staffMember.isActive,
+      image: staffMember.image,
+      bio: staffMember.bio,
+      email: staffMember.email ?? "",
+      linkedin: staffMember.linkedin ?? "",
+      twitter: staffMember.twitter ?? "",
+      isActive: staffMember.isActive === null ? true : staffMember.isActive,
     });
     setIsDialogOpen(true);
   };
@@ -180,14 +172,10 @@ export default function AdminStaff() {
               </div>
 
               <div>
-                <Label htmlFor="photoUrl">Photo URL</Label>
-                <Input
-                  id="photoUrl"
-                  value={form.photoUrl ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, photoUrl: e.target.value })
-                  }
-                  placeholder="https://..."
+                <ImageUpload
+                  label="Profile Image"
+                  value={form.image}
+                  onChange={(url) => setForm({ ...form, image: url })}
                 />
               </div>
 
@@ -198,20 +186,42 @@ export default function AdminStaff() {
                   value={form.bio ?? ""}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   rows={3}
+                  required
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="space-y-3 pt-2">
+                <Label>Social Links (Optional)</Label>
+                <div className="grid grid-cols-1 gap-3">
+                  <Input
+                    placeholder="Email Address"
+                    value={form.email ?? ""}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  />
+                  <Input
+                    placeholder="LinkedIn URL"
+                    value={form.linkedin ?? ""}
+                    onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Twitter/X URL"
+                    value={form.twitter ?? ""}
+                    onChange={(e) => setForm({ ...form, twitter: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
                 <input
                   id="isActive"
                   type="checkbox"
-                  checked={form.isActive}
+                  checked={form.isActive ?? true}
                   onChange={(e) =>
                     setForm({ ...form, isActive: e.target.checked })
                   }
-                  className="h-4 w-4"
+                  className="h-4 w-4 rounded border-gray-300"
                 />
-                <Label htmlFor="isActive">Active</Label>
+                <Label htmlFor="isActive">Show on About Page</Label>
               </div>
 
               <Button
@@ -261,7 +271,9 @@ export default function AdminStaff() {
                   <TableCell className="font-medium">{member.name}</TableCell>
                   <TableCell>{member.role}</TableCell>
                   <TableCell>
-                    {member.isActive ? "Active" : "Inactive"}
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${member.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+                      {member.isActive ? "Active" : "Hidden"}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

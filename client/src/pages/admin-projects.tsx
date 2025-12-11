@@ -1,5 +1,3 @@
-// client/src/pages/admin-projects.tsx
-
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -25,44 +23,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
-
-type ProjectStatus = "ongoing" | "planned" | "completed";
-
-type Project = {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  description?: string | null;
-  status: ProjectStatus;
-  startDate?: string | null;
-  endDate?: string | null;
-  heroImageUrl?: string | null;
-};
-
-type ProjectInput = Omit<Project, "id">;
+import ImageUpload from "@/components/ImageUpload";
+import type { Project, InsertProject } from "@shared/schema";
 
 export default function AdminProjects() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [form, setForm] = useState<ProjectInput>({
+
+  // Default form state
+  const initialForm: InsertProject = {
     title: "",
-    slug: "",
-    summary: "",
+    category: "",
     description: "",
-    status: "ongoing",
-    startDate: "",
-    endDate: "",
-    heroImageUrl: "",
-  });
+    image: "",
+    duration: "",
+    beneficiaries: "",
+    partners: "",
+    outcomes: "",
+  };
+
+  const [form, setForm] = useState<InsertProject>(initialForm);
 
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: ProjectInput) => {
+    mutationFn: async (data: InsertProject) => {
       await apiRequest("POST", "/api/projects", data);
     },
     onSuccess: () => {
@@ -80,7 +68,7 @@ export default function AdminProjects() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<ProjectInput> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertProject> }) => {
       await apiRequest("PATCH", `/api/projects/${id}`, data);
     },
     onSuccess: () => {
@@ -117,16 +105,7 @@ export default function AdminProjects() {
 
   const openCreate = () => {
     setEditingProject(null);
-    setForm({
-      title: "",
-      slug: "",
-      summary: "",
-      description: "",
-      status: "ongoing",
-      startDate: "",
-      endDate: "",
-      heroImageUrl: "",
-    });
+    setForm(initialForm);
     setIsDialogOpen(true);
   };
 
@@ -134,13 +113,13 @@ export default function AdminProjects() {
     setEditingProject(project);
     setForm({
       title: project.title,
-      slug: project.slug,
-      summary: project.summary,
-      description: project.description ?? "",
-      status: project.status,
-      startDate: project.startDate ?? "",
-      endDate: project.endDate ?? "",
-      heroImageUrl: project.heroImageUrl ?? "",
+      category: project.category,
+      description: project.description,
+      image: project.image,
+      duration: project.duration,
+      beneficiaries: project.beneficiaries,
+      partners: project.partners,
+      outcomes: project.outcomes,
     });
     setIsDialogOpen(true);
   };
@@ -165,7 +144,7 @@ export default function AdminProjects() {
               <Plus className="mr-2 h-4 w-4" /> Add Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[540px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingProject ? "Edit Project" : "Add New Project"}
@@ -173,105 +152,94 @@ export default function AdminProjects() {
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    placeholder="e.g. Education, Health"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  required
+                <ImageUpload
+                  label="Project Image"
+                  value={form.image}
+                  onChange={(url) => setForm({ ...form, image: url })}
                 />
               </div>
 
               <div>
-                <Label htmlFor="slug">Slug (URL)</Label>
-                <Input
-                  id="slug"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="example-project"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="summary">Summary</Label>
-                <Input
-                  id="summary"
-                  value={form.summary}
-                  onChange={(e) =>
-                    setForm({ ...form, summary: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Description (Short)</Label>
                 <Textarea
                   id="description"
-                  value={form.description ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={3}
+                  required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  className="border rounded-md px-3 py-2 w-full bg-background"
-                  value={form.status}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      status: e.target.value as ProjectStatus,
-                    })
-                  }
-                >
-                  <option value="ongoing">Ongoing</option>
-                  <option value="planned">Planned</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
+              <div className="space-y-4 border p-4 rounded-md bg-muted/20">
+                <h3 className="font-semibold text-sm">Project Details</h3>
 
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="duration">Duration</Label>
+                    <Input
+                      id="duration"
+                      value={form.duration}
+                      onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                      placeholder="e.g. 2023 - Present"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="beneficiaries">Beneficiaries</Label>
+                    <Input
+                      id="beneficiaries"
+                      value={form.beneficiaries}
+                      onChange={(e) => setForm({ ...form, beneficiaries: e.target.value })}
+                      placeholder="e.g. 500 women"
+                      required
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <Label htmlFor="startDate">Start Date</Label>
+                  <Label htmlFor="partners">Partners</Label>
                   <Input
-                    id="startDate"
-                    type="date"
-                    value={form.startDate ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, startDate: e.target.value })
-                    }
+                    id="partners"
+                    value={form.partners}
+                    onChange={(e) => setForm({ ...form, partners: e.target.value })}
+                    placeholder="e.g. Local Municipality, NGOs"
+                    required
                   />
                 </div>
+
                 <div>
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={form.endDate ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, endDate: e.target.value })
-                    }
+                  <Label htmlFor="outcomes">Key Outcomes</Label>
+                  <Textarea
+                    id="outcomes"
+                    rows={2}
+                    value={form.outcomes}
+                    onChange={(e) => setForm({ ...form, outcomes: e.target.value })}
+                    required
                   />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="heroImageUrl">Hero Image URL</Label>
-                <Input
-                  id="heroImageUrl"
-                  value={form.heroImageUrl ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, heroImageUrl: e.target.value })
-                  }
-                  placeholder="https://..."
-                />
               </div>
 
               <Button
@@ -294,8 +262,8 @@ export default function AdminProjects() {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Slug</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Beneficiaries</TableHead>
               <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -321,10 +289,10 @@ export default function AdminProjects() {
                   <TableCell className="font-medium">
                     {project.title}
                   </TableCell>
-                  <TableCell className="capitalize">
-                    {project.status}
+                  <TableCell>
+                    {project.category}
                   </TableCell>
-                  <TableCell>{project.slug}</TableCell>
+                  <TableCell>{project.beneficiaries}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
@@ -361,3 +329,4 @@ export default function AdminProjects() {
     </AdminLayout>
   );
 }
+

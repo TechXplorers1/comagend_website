@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   insertContactMessageSchema,
   type InsertContactMessage,
+  type SiteConfig,
 } from "@shared/schema";
 import {
   Form,
@@ -21,13 +22,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+
+  const { data: config } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config"],
+  });
 
   const form = useForm<InsertContactMessage>({
     resolver: zodResolver(insertContactMessageSchema),
@@ -70,20 +75,20 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email",
-      content: "info@comagend.org",
+      content: config?.email || "info@comagend.org",
       description: "Send us an email anytime",
     },
     {
       icon: Phone,
       title: "Phone",
-      content: "+256 123 456 789",
+      content: config?.phone || "+256 123 456 789",
       description: "Mon–Fri from 8am to 5pm EAT",
     },
     {
       icon: MapPin,
       title: "Office",
-      content: "Kampala, Uganda",
-      description: "Plot 123, Main Street, Kampala",
+      content: config?.address || "Kampala, Uganda",
+      description: "Visit our main office",
     },
     {
       icon: Clock,

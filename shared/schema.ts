@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -39,6 +39,7 @@ export const staff = pgTable("staff", {
   email: text("email"),
   linkedin: text("linkedin"),
   twitter: text("twitter"),
+  isActive: boolean("is_active").notNull().default(true),
 });
 
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
@@ -143,6 +144,22 @@ export const insertImpactStatSchema = createInsertSchema(impactStats).omit({ id:
 export const insertPartnerSchema = createInsertSchema(partners).omit({ id: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true });
 
+export const siteConfig = pgTable("site_config", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().default(""),
+  phone: text("phone").notNull().default(""),
+  address: text("address").notNull().default(""),
+  aboutText: text("about_text").notNull().default(""),
+  missionText: text("mission_text").notNull().default(""),
+  visionText: text("vision_text").notNull().default(""),
+  facebookUrl: text("facebook_url"),
+  instagramUrl: text("instagram_url"),
+  twitterUrl: text("twitter_url"),
+  linkedinUrl: text("linkedin_url"),
+});
+
+export const insertSiteConfigSchema = createInsertSchema(siteConfig).omit({ id: true });
+
 /* -------------------- TYPES -------------------- */
 
 export type Program = typeof programs.$inferSelect;
@@ -177,3 +194,6 @@ export type InsertPartner = z.infer<typeof insertPartnerSchema>;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type SiteConfig = typeof siteConfig.$inferSelect;
+export type InsertSiteConfig = z.infer<typeof insertSiteConfigSchema>;

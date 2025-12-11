@@ -14,10 +14,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import type { SiteConfig } from "@shared/schema";
 
 type PolicyModalType = "privacy" | "terms" | null;
 
@@ -25,6 +26,10 @@ export default function Footer() {
   const [email, setEmail] = useState("");
   const [openModal, setOpenModal] = useState<PolicyModalType>(null);
   const { toast } = useToast();
+
+  const { data: config } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config"],
+  });
 
   const newsletterMutation = useMutation({
     mutationFn: async (email: string) => {
@@ -95,7 +100,7 @@ export default function Footer() {
           </p>
           <p>
             If you wish to update or delete your personal information, you can
-            contact us at <span className="font-medium">info@comagend.org</span>.
+            contact us at <span className="font-medium">{config?.email || "info@comagend.org"}</span>.
           </p>
         </>
       );
@@ -120,7 +125,7 @@ export default function Footer() {
           </p>
           <p>
             If you have any questions about these terms, please contact us at{" "}
-            <span className="font-medium">info@comagend.org</span>.
+            <span className="font-medium">{config?.email || "info@comagend.org"}</span>.
           </p>
         </>
       );
@@ -177,42 +182,54 @@ export default function Footer() {
               communities through sustainable programs and initiatives.
             </p>
             <div className="flex space-x-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                data-testid="button-social-facebook"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                data-testid="button-social-twitter"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                data-testid="button-social-instagram"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                data-testid="button-social-linkedin"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="h-4 w-4" />
-              </Button>
+              {config?.facebookUrl && (
+                <a href={config.facebookUrl} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+              {config?.twitterUrl && (
+                <a href={config.twitterUrl} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    aria-label="Twitter"
+                  >
+                    <Twitter className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+              {config?.instagramUrl && (
+                <a href={config.instagramUrl} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+              {config?.linkedinUrl && (
+                <a href={config.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
             </div>
           </motion.div>
 
@@ -232,9 +249,6 @@ export default function Footer() {
                   <Link href={link.href}>
                     <a
                       className="text-muted-foreground hover:text-primary transition-colors font-sans text-sm"
-                      data-testid={`link-footer-${link.label
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
                     >
                       {link.label}
                     </a>
@@ -260,9 +274,6 @@ export default function Footer() {
                   <a
                     href={program.href}
                     className="text-muted-foreground hover:text-primary transition-colors font-sans text-sm"
-                    data-testid={`link-program-${program.label
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
                   >
                     {program.label}
                   </a>
@@ -293,7 +304,6 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="font-sans"
-                data-testid="input-newsletter-email"
                 aria-label="Email address"
               />
               <Button
@@ -301,7 +311,6 @@ export default function Footer() {
                 variant="default"
                 className="w-full font-sans font-medium"
                 disabled={newsletterMutation.isPending}
-                data-testid="button-newsletter-subscribe"
               >
                 {newsletterMutation.isPending ? "Subscribing..." : "Subscribe"}
               </Button>
@@ -309,15 +318,15 @@ export default function Footer() {
             <div className="mt-4 space-y-2">
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span className="font-sans">info@comagend.org</span>
+                <span className="font-sans">{config?.email || "info@comagend.org"}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span className="font-sans">+123 456 7890</span>
+                <span className="font-sans">{config?.phone || "+123 456 7890"}</span>
               </div>
               <div className="flex items-start space-x-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5" />
-                <span className="font-sans">Kampala, Uganda</span>
+                <span className="font-sans">{config?.address || "Kampala, Uganda"}</span>
               </div>
             </div>
           </motion.div>

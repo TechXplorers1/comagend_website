@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function AdminPrograms() {
   const { toast } = useToast();
@@ -190,9 +191,12 @@ export default function AdminPrograms() {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Program Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <ImageUpload
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

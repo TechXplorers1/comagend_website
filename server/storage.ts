@@ -8,6 +8,14 @@ import {
   type Story,
   type InsertProgram,
   type InsertBlogPost,
+  type SiteConfig,
+  type InsertSiteConfig,
+  type Project,
+  type InsertProject,
+  type Staff,
+  type InsertStaff,
+  type Donation,
+  type InsertDonation,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -26,6 +34,26 @@ export interface IStorage {
   updateProgram(id: string, program: Partial<InsertProgram>): Promise<Program>;
   deleteProgram(id: string): Promise<void>;
   getAllStories(): Promise<Story[]>;
+
+  // Site Config
+  getSiteConfig(): Promise<SiteConfig>;
+  updateSiteConfig(config: Partial<InsertSiteConfig>): Promise<SiteConfig>;
+
+  // Projects
+  getAllProjects(): Promise<Project[]>;
+  createProject(project: InsertProject): Promise<Project>;
+  updateProject(id: string, project: Partial<InsertProject>): Promise<Project>;
+  deleteProject(id: string): Promise<void>;
+
+  // Staff
+  getAllStaff(): Promise<Staff[]>;
+  createStaff(staff: InsertStaff): Promise<Staff>;
+  updateStaff(id: string, staff: Partial<InsertStaff>): Promise<Staff>;
+  deleteStaff(id: string): Promise<void>;
+
+  // Donations
+  getAllDonations(): Promise<Donation[]>;
+  createDonation(donation: InsertDonation): Promise<Donation>;
 }
 
 export class MemStorage implements IStorage {
@@ -34,6 +62,10 @@ export class MemStorage implements IStorage {
   private blogPosts: Map<string, BlogPost>;
   private programs: Map<string, Program>;
   private stories: Map<string, Story>;
+  private projects: Map<string, Project>;
+  private staff: Map<string, Staff>;
+  private donations: Map<string, Donation>;
+  private siteConfig: SiteConfig;
 
   constructor() {
     this.newsletterSubscriptions = new Map();
@@ -41,6 +73,22 @@ export class MemStorage implements IStorage {
     this.blogPosts = new Map();
     this.programs = new Map();
     this.stories = new Map();
+    this.projects = new Map();
+    this.staff = new Map();
+    this.donations = new Map();
+    this.siteConfig = {
+      id: "default",
+      email: "info@comagend.org",
+      phone: "+1 234 567 890",
+      address: "123 Charity Lane, Cityville, Country",
+      aboutText: "COMAGEND is dedicated to empowering communities through sustainable development.",
+      missionText: "To create lasting change by empowering individuals and communities.",
+      visionText: "A world where every community thrives with dignity and opportunity.",
+      facebookUrl: "",
+      instagramUrl: "",
+      twitterUrl: "",
+      linkedinUrl: "",
+    };
     this.seedData();
   }
 
@@ -131,9 +179,87 @@ export class MemStorage implements IStorage {
       },
     ];
 
+    const projects: Project[] = [
+      {
+        id: randomUUID(),
+        title: "Women's Literacy & Skills Development",
+        category: "Education",
+        description:
+          "A comprehensive program providing adult literacy classes and vocational skills training to women in rural communities, enabling economic independence and community leadership.",
+        image: "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg?auto=compress&cs=tinysrgb&w=800",
+        duration: "2022 - Present",
+        beneficiaries: "5,000+ women",
+        partners: "Local Education Authority, Women's Cooperative",
+        outcomes: "85% participants now literate, 60% started small businesses",
+      },
+      {
+        id: randomUUID(),
+        title: "Youth Leadership Academy",
+        category: "Youth Development",
+        description:
+          "An intensive leadership and entrepreneurship training program for young people aged 18-25, equipping them with skills to become change-makers in their communities.",
+        image: "https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=800",
+        duration: "2021 - Present",
+        beneficiaries: "2,500+ youth",
+        partners: "University Partnership, Business Incubators",
+        outcomes: "200+ youth-led initiatives launched, 75% employment rate",
+      },
+      {
+        id: randomUUID(),
+        title: "Community Health Champions",
+        category: "Health",
+        description:
+          "Training community health volunteers to provide essential healthcare education and services in underserved areas, improving health outcomes and awareness.",
+        image: "https://images.pexels.com/photos/6129201/pexels-photo-6129201.jpeg?auto=compress&cs=tinysrgb&w=800",
+        duration: "2020 - Present",
+        beneficiaries: "25,000+ community members",
+        partners: "Ministry of Health, Local Clinics",
+        outcomes:
+          "40% reduction in preventable diseases, 150 trained health volunteers",
+      },
+    ];
+
+    const staffMembers: Staff[] = [
+      {
+        id: randomUUID(),
+        name: "Dr. Amina Kabila",
+        role: "Executive Director",
+        bio: "Leading COMAGEND with 15+ years of experience in community development and gender advocacy.",
+        image: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800",
+        email: "amina@comagend.org",
+        linkedin: "#",
+        twitter: "#",
+        isActive: true,
+      },
+      {
+        id: randomUUID(),
+        name: "Robert Mensah",
+        role: "Program Coordinator",
+        bio: "Coordinating our youth development initiatives across multiple regions with proven impact.",
+        image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800",
+        email: "robert@comagend.org",
+        linkedin: "#",
+        twitter: "#",
+        isActive: true,
+      },
+      {
+        id: randomUUID(),
+        name: "Grace Omondi",
+        role: "Community Outreach Lead",
+        bio: "Bridging the gap between our programs and the communities we serve with passion and dedication.",
+        image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800",
+        email: "grace@comagend.org",
+        linkedin: "#",
+        twitter: "#",
+        isActive: true,
+      },
+    ];
+
     blogPosts.forEach(post => this.blogPosts.set(post.id, post));
     programs.forEach(program => this.programs.set(program.id, program));
     stories.forEach(story => this.stories.set(story.id, story));
+    projects.forEach(project => this.projects.set(project.id, project));
+    staffMembers.forEach(staff => this.staff.set(staff.id, staff));
   }
 
   async createNewsletterSubscription(
@@ -242,6 +368,105 @@ export class MemStorage implements IStorage {
 
   async getAllStories(): Promise<Story[]> {
     return Array.from(this.stories.values());
+  }
+
+  // Site Config
+  async getSiteConfig(): Promise<SiteConfig> {
+    return this.siteConfig;
+  }
+
+  async updateSiteConfig(config: Partial<InsertSiteConfig>): Promise<SiteConfig> {
+    this.siteConfig = { ...this.siteConfig, ...config };
+    return this.siteConfig;
+  }
+
+  // Projects
+  async getAllProjects(): Promise<Project[]> {
+    return Array.from(this.projects.values());
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const id = randomUUID();
+    const project: Project = {
+      id,
+      title: insertProject.title,
+      category: insertProject.category,
+      description: insertProject.description,
+      image: insertProject.image,
+      duration: insertProject.duration,
+      beneficiaries: insertProject.beneficiaries,
+      partners: insertProject.partners,
+      outcomes: insertProject.outcomes,
+    };
+    this.projects.set(id, project);
+    return project;
+  }
+
+  async updateProject(id: string, updateProject: Partial<InsertProject>): Promise<Project> {
+    const existing = this.projects.get(id);
+    if (!existing) throw new Error("Project not found");
+    const updated = { ...existing, ...updateProject };
+    this.projects.set(id, updated);
+    return updated;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    this.projects.delete(id);
+  }
+
+  // Staff
+  async getAllStaff(): Promise<Staff[]> {
+    return Array.from(this.staff.values());
+  }
+
+  async createStaff(insertStaff: InsertStaff): Promise<Staff> {
+    const id = randomUUID();
+    const staff: Staff = {
+      id,
+      name: insertStaff.name,
+      role: insertStaff.role,
+      bio: insertStaff.bio,
+      image: insertStaff.image,
+      email: insertStaff.email ?? null,
+      linkedin: insertStaff.linkedin ?? null,
+      twitter: insertStaff.twitter ?? null,
+      isActive: insertStaff.isActive ?? true,
+    };
+    this.staff.set(id, staff);
+    return staff;
+  }
+
+  async updateStaff(id: string, updateStaff: Partial<InsertStaff>): Promise<Staff> {
+    const existing = this.staff.get(id);
+    if (!existing) throw new Error("Staff member not found");
+    const updated = { ...existing, ...updateStaff };
+    this.staff.set(id, updated);
+    return updated;
+  }
+
+  async deleteStaff(id: string): Promise<void> {
+    this.staff.delete(id);
+  }
+
+  // Donations
+  async getAllDonations(): Promise<Donation[]> {
+    return Array.from(this.donations.values()).sort(
+      (a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+    );
+  }
+
+  async createDonation(insertDonation: InsertDonation): Promise<Donation> {
+    const id = randomUUID();
+    const donation: Donation = {
+      id,
+      amount: insertDonation.amount,
+      donorEmail: insertDonation.donorEmail,
+      program: insertDonation.program,
+      donorName: insertDonation.donorName ?? null,
+      createdAt: new Date(),
+    };
+    this.donations.set(id, donation);
+    return donation;
   }
 }
 
